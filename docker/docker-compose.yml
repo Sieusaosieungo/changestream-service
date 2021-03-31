@@ -1,0 +1,83 @@
+version: '3'
+
+services:
+  mongo1:
+    hostname: mongo1
+    container_name: mongo1
+    image: mongo
+    volumes:
+      - ./data/data1/db:/data/db
+      - ./data/data1/configdb:/data/configdb
+    networks:
+      - app-network
+    expose:
+      - 27017
+    ports:
+      - 30001:27017
+    restart: always
+    entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'devrs']
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+
+  mongo2:
+    hostname: mongo2
+    container_name: mongo2
+    image: mongo
+    volumes:
+      - ./data/data2/db:/data/db
+      - ./data/data2/configdb:/data/configdb
+    networks:
+      - app-network
+    expose:
+      - 27017
+    ports:
+      - 30002:27017
+    restart: always
+    entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'devrs']
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+  mongo3:
+    hostname: mongo3
+    container_name: mongo3
+    image: mongo
+    volumes:
+      - ./data/data3/db:/data/db
+      - ./data/data3/configdb:/data/configdb
+    networks:
+      - app-network
+    expose:
+      - 27017
+    ports:
+      - 30003:27017
+    restart: always
+    entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'devrs']
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    restart: always
+    volumes:
+      - '/Users/manhhust/Desktop/changestream-service:/app'
+    ports:
+      - ${PORT}:${PORT}
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - MONGO_HOST_1=${MONGO_HOST_1}
+      - MONGO_HOST_2=${MONGO_HOST_2}
+      - MONGO_HOST_3=${MONGO_HOST_3}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_DATABASE_MONITORED=${MONGO_DATABASE_MONITORED}
+      - MONGO_COLLECTIONS_MONITORED=${MONGO_COLLECTIONS_MONITORED}
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
