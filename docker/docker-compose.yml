@@ -1,9 +1,25 @@
 version: '3'
 
 services:
-  mongo1:
-    hostname: mongo1
-    container_name: mongo1
+  mongodb-sd:
+    image: mongo:latest
+    container_name: mongodb-sd
+    restart: always
+    volumes:
+      - mongodb-sd:/data/db
+    ports:
+      - "${MONGO_PUBLIC_PORT}:${MONGO_PORT}"
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+    entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'devrs']
+    networks:
+      - app-network
+
+  mongo-r1:
+    hostname: mongo-r1
+    container_name: mongo-r1
     image: mongo
     volumes:
       - ./data/data1/db:/data/db
@@ -19,41 +35,6 @@ services:
     environment:
       - TZ=Asia/Ho_Chi_Minh
 
-  mongo2:
-    hostname: mongo2
-    container_name: mongo2
-    image: mongo
-    volumes:
-      - ./data/data2/db:/data/db
-      - ./data/data2/configdb:/data/configdb
-    networks:
-      - app-network
-    expose:
-      - 27017
-    ports:
-      - 30002:27017
-    restart: always
-    entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'devrs']
-    environment:
-      - TZ=Asia/Ho_Chi_Minh
-  mongo3:
-    hostname: mongo3
-    container_name: mongo3
-    image: mongo
-    volumes:
-      - ./data/data3/db:/data/db
-      - ./data/data3/configdb:/data/configdb
-    networks:
-      - app-network
-    expose:
-      - 27017
-    ports:
-      - 30003:27017
-    restart: always
-    entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'devrs']
-    environment:
-      - TZ=Asia/Ho_Chi_Minh
-
   backend:
     build:
       context: ..
@@ -61,23 +42,21 @@ services:
     restart: always
     volumes:
       - '/Users/manhhust/Desktop/changestream-service:/app'
-    ports:
-      - ${PORT}:${PORT}
     environment:
       - TZ=Asia/Ho_Chi_Minh
-      - MONGO_HOST_1=${MONGO_HOST_1}
-      - MONGO_HOST_2=${MONGO_HOST_2}
-      - MONGO_HOST_3=${MONGO_HOST_3}
+      - MONGO_HOST_ORIGINAL=${MONGO_HOST_ORIGINAL}
+      - MONGO_HOST_R1=${MONGO_HOST_R1}
       - MONGO_PORT=${MONGO_PORT}
       - MONGO_DATABASE_MONITORED=${MONGO_DATABASE_MONITORED}
       - MONGO_COLLECTIONS_MONITORED=${MONGO_COLLECTIONS_MONITORED}
     depends_on:
-      - mongo1
-      - mongo2
-      - mongo3
+      - mongodb-sd
+      - mongo-r1
     networks:
       - app-network
 
+volumes:
+  mongodb-sd:
 networks:
   app-network:
     driver: bridge
