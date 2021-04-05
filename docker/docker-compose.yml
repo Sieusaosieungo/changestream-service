@@ -8,7 +8,7 @@ services:
     volumes:
       - mongodb-sd:/data/db
     ports:
-      - "${MONGO_PUBLIC_PORT}:${MONGO_PORT}"
+      - '${MONGO_PUBLIC_PORT}:${MONGO_PORT}'
     environment:
       - TZ=Asia/Ho_Chi_Minh
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
