@@ -36,7 +36,6 @@ services:
       - TZ=Asia/Ho_Chi_Minh
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
-    entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'devrs']
     
 volumes:
   mongodb-sd:
