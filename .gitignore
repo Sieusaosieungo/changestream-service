@@ -1,6 +1,5 @@
 node_modules
 .env
-docker/data
 docker/.env
 docker/run.sh
 docker/bot
