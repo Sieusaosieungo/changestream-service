@@ -14,8 +14,6 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
     entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'devrs']
-    networks:
-      - app-network
 
   mongo-r1:
     hostname: mongo-r1
@@ -23,8 +21,7 @@ services:
     image: mongo
     volumes:
       - mongo-r1:/data/db
-    networks:
-      - app-network
+
     expose:
       - 27017
     ports:
@@ -48,15 +45,16 @@ services:
       - MONGO_PORT=${MONGO_PORT}
       - MONGO_DATABASE_MONITORED=${MONGO_DATABASE_MONITORED}
       - MONGO_COLLECTIONS_MONITORED=${MONGO_COLLECTIONS_MONITORED}
+      - GATEWAY_HOST=${GATEWAY_HOST}
+      - GATEWAY_PORT=${GATEWAY_PORT}
     depends_on:
       - mongodb-sd
       - mongo-r1
-    networks:
-      - app-network
 
 volumes:
   mongodb-sd:
   mongo-r1:
 networks:
-  app-network:
-    driver: bridge
+  default:
+    external:
+      name: gateway_default
