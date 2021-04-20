@@ -37,7 +37,7 @@ services:
       dockerfile: docker/Dockerfile
     restart: always
     volumes:
-      - '/Users/manhhust/Desktop/changestream-service:/app'
+      - '..:/app'
     environment:
       - TZ=Asia/Ho_Chi_Minh
       - MONGO_HOST_ORIGINAL=${MONGO_HOST_ORIGINAL}
@@ -54,7 +54,3 @@ services:
 volumes:
   mongodb-sd:
   mongo-r1:
-networks:
-  default:
-    external:
-      name: gateway_default
